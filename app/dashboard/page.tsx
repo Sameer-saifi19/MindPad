@@ -1,6 +1,7 @@
 'use client'
 
 import NoteCard from "@/components/note";
+import { DialogOpen } from "@/components/note-dialog";
 import { useEffect, useState } from "react";
 
 type Note = {
@@ -31,6 +32,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <DialogOpen/>
       <div className="grid grid-cols-4 gap-6 m-20">
         {notes.map((note) => (
             <NoteCard key={note.id} title={note.title} description={note.desc} />
