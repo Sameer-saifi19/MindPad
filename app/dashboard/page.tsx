@@ -1,70 +1,41 @@
-"use client";
+'use client'
+
+import NoteCard from "@/components/note";
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { DialogOpen } from "./new-note";
-import { Button } from "@/components/ui/button";
-import { prisma } from "@/lib/prisma";
 
 type Note = {
-  id: string; // Prisma uses string (cuid) by default
-  title: string;
-  desc: string;
+    id: string;
+    title: string;
+    desc: string;
 };
 
-export default function NotesList() {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Dashboard() {
+    const [ notes, setNotes ] = useState<Note[]>([]);
+    const [ loading , setLoading ] = useState(true);
 
-  useEffect(() => {
-    async function fetchNotes() {
-      try {
-        const res = await fetch("/api/get-notes");
-        const data = await res.json();
-        console.log("API response:", data);
-
-        if (Array.isArray(data)) {
-          setNotes(data);
-        } else {
-          setNotes([]); // fallback if backend misbehaves
+    useEffect( () => {
+        async function fetchNotes() {
+            try{
+                const res = await fetch("api/notes")
+                const data = await res.json();
+                setNotes(data)
+            }catch(error){
+                console.error("Failed to fetch Notes", error)
+                setNotes([])
+            } finally {
+                setLoading(false)
+            }
         }
-      } catch (err) {
-        console.error("Failed to fetch notes:", err);
-        setNotes([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchNotes();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-
-  if (notes.length === 0) {
-    return <p className="text-gray-500">No notes yet.</p>;
-  }
+        fetchNotes();
+    }, [])
 
   return (
-    <div className="flex gap-8 m-10">
-      <DialogOpen />
-      {notes.map((note) => (
-        <Card key={note.id}>
-          <CardHeader>
-            <CardTitle>{note.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>{note.desc}</CardDescription>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-4 gap-6 m-20">
+        {notes.map((note) => (
+            <NoteCard key={note.id} title={note.title} description={note.desc} />
+        ))}
+      </div>
+    </>
   );
 }
